@@ -1,13 +1,21 @@
 #!/bin/bash
 
+set -e
+
 echo "===================================="
-echo "Qwen Vulkan Installer"
+echo "Qwen Vulkan Automatic Installer"
 echo "===================================="
 
 bash scripts/check.sh
 
 bash scripts/install_packages.sh
 
-echo ""
+bash scripts/install_vulkan_sdk.sh
 
-echo "Finished"
+bash scripts/create_python.sh
+
+bash scripts/build_llama.sh
+
+bash scripts/download_model.sh
+
+bash scripts/finish.sh
