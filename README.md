@@ -6,7 +6,7 @@ Automatic installer for llama.cpp + Vulkan + Qwen3.6.
 - Ubuntu 24.04
 - AMD GPU dengan Vulkan
 - Internet
-- Minimal 80 GB ruang kosong
+- Minimal 50 GB ruang kosong
 
 
 ## Installation
