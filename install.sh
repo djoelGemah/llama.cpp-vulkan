@@ -4,6 +4,8 @@ echo "===================================="
 echo "Qwen Vulkan Installer"
 echo "===================================="
 
-echo "Installer berjalan..."
+bash scripts/check.sh
 
-echo "Selesai."
+echo ""
+
+echo "Installation Finished"
