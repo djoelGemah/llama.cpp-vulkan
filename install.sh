@@ -29,9 +29,14 @@ echo "===================================="
 echo "Qwen Vulkan Automatic Installer"
 echo "===================================="
 
+if [ "$EUID" -ne 0 ]; then
+    echo "ERROR: Jalankan dengan sudo/root."
+    exit 1
+fi
+
 echo ""
 echo "===================================="
-echo "STEP 1: Checking and installing requirements"
+echo "STEP 1: Installing requirements"
 echo "===================================="
 
 bash scripts/check.sh
@@ -41,30 +46,97 @@ bash scripts/install_vulkan_sdk.sh
 
 echo ""
 echo "===================================="
-echo "STEP 2: Setting up Vulkan environment"
+echo "STEP 2: Loading Vulkan SDK environment"
 echo "===================================="
 
-source /opt/1.4.357.1/setup-env.sh
+VULKAN_ENV="/opt/1.4.357.1/setup-env.sh"
 
-cd /opt/llama.cpp
+if [ ! -f "$VULKAN_ENV" ]; then
+    echo "ERROR: Vulkan SDK environment tidak ditemukan:"
+    echo "$VULKAN_ENV"
+    exit 1
+fi
 
-rm -rf build
+# WAJIB: aktifkan environment Vulkan di shell installer
+source "$VULKAN_ENV"
+
+echo "Vulkan environment loaded."
+
+echo ""
+echo "Checking glslc..."
+
+if ! command -v glslc >/dev/null 2>&1; then
+    echo "ERROR: glslc tidak aktif setelah source setup-env.sh"
+    exit 1
+fi
+
+echo "glslc: $(which glslc)"
 
 
 echo ""
 echo "===================================="
-echo "STEP 3: Building llama.cpp with Vulkan"
+echo "STEP 3: Installing llama.cpp"
 echo "===================================="
 
-cmake -S . -B build -DGGML_VULKAN=ON -DCMAKE_BUILD_TYPE=Release
+if [ ! -d "/opt/llama.cpp" ]; then
+    git clone https://github.com/ggerganov/llama.cpp.git /opt/llama.cpp
+else
+    echo "/opt/llama.cpp already exists."
+fi
+
+cd /opt/llama.cpp
+
+
+echo ""
+echo "===================================="
+echo "STEP 4: Building llama.cpp with Vulkan"
+echo "===================================="
+
+rm -rf build
+
+cmake -S . -B build \
+    -DGGML_VULKAN=ON \
+    -DCMAKE_BUILD_TYPE=Release
+
 cmake --build build -j"$(nproc)"
 
 
 echo ""
 echo "===================================="
-echo "STEP 4: Setting up Python environment"
+echo "STEP 5: Setting up Python"
 echo "===================================="
 
+python3 -m venv /opt/venv
+
+source /opt/venv/bin/activate
+
+pip install --upgrade pip
+pip install huggingface_hub
+
+
+echo ""
+echo "===================================="
+echo "INSTALLATION COMPLETE"
+echo "===================================="
+
+echo ""
+echo "Vulkan compiler:"
+which glslc
+
+echo ""
+echo "llama.cpp:"
+echo "/opt/llama.cpp"
+
+echo ""
+echo "llama.cpp binaries:"
+ls -lh /opt/llama.cpp/build/bin
+
+echo ""
+echo "Python:"
+echo "/opt/venv"
+
+echo ""
+echo "===================================="
 python3 -m venv /opt/venv
 
 source /opt/venv/bin/activate
