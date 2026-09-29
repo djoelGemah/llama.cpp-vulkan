@@ -12,8 +12,8 @@ Automatic installer for llama.cpp + Vulkan + Qwen3.6.
 ## Installation
 
 ```bash
-git clone https://github.com/djoelGemah/qwen-vulkan-installer.git
-cd qwen-vulkan-installer
+git clone https://github.com/djoelGemah/llama.cpp-vulkan.git
+cd llama.cpp-vulkan
 
 chmod +x install.sh
 
